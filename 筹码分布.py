@@ -1,7 +1,7 @@
 
 
 import pandas as pd
-
+import copy
 
 
 class ChipDistribution():
@@ -102,7 +102,7 @@ class ChipDistribution():
             volT = vol[i]
             TurnoverRateT = TurnoverRate[i]
             avgT = avg[i]
-            print(date[i])
+            # print(date[i])
             dateT = date[i]
             self.calcu(dateT,highT, lowT,avgT, volT, TurnoverRateT/100, flag=flag, AC=AC)  # 东方财富的小数位要注意，兄弟萌。我不除100懵逼了
 
@@ -147,17 +147,35 @@ class ChipDistribution():
                         bili = 0
                     Profit.append(bili)
 
-            import matplotlib.pyplot as plt
-            plt.plot(date[len(date) - 200:-1], Profit[len(date) - 200:-1])
-            plt.show()
+            # import matplotlib.pyplot as plt
+            # plt.plot(date[len(date) - 200:-1], Profit[len(date) - 200:-1])
+            # plt.show()
 
             return Profit
 
-    def lwinner(self,N = 50, p=None):
+    def lwinner(self,N = 5, p=None):
 
+        data = copy.deepcopy(self.data)
+        date = data['date']
+        ans = []
+        for i in range(len(date)):
+            print(date[i])
+            if i < N:
+                ans.append(None)
+                continue
+            self.data = data[i-N:i]
+            self.data.index= range(0,N)
+            self.__init__()
+            self.calcuChip()    #使用默认计算方式
+            a = self.winner(p)
+            ans.append(a[-1])
+        import matplotlib.pyplot as plt
+        plt.plot(date[len(date) - 60:-1], ans[len(date) - 60:-1])
+        plt.show()
 
+        self.data = data
+        return ans
 
-        pass
 
 
     def cost(self,N):
@@ -195,3 +213,5 @@ if __name__ == "__main__":
     a.cost(90) #成本分布
 
 
+
+    a.lwinner()
